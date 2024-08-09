@@ -61,7 +61,7 @@
                                         <td>{{ $loan->installment_amount }}</td>
 
                                         <td>
-                                        <a href="{{route('edit-loan')}}"><i class="fa fa-inr" title="Amortization schedule" aria-hidden="true"></i></a>
+                                        <a href="{{route('amortization-schedule',$loan->loan_id)}}"><i class="fa fa-inr" title="Amortization schedule" aria-hidden="true"></i></a>
                                         <a href="{{route('del-loan')}}"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
                                         </td>
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>

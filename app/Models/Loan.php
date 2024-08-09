@@ -24,7 +24,7 @@ protected $casts = [
 
 public function schedules()
 {
-    return $this->hasMany(Schedule::class);
+    return $this->hasMany(Schedule::class,'loan_id');
 }
 
 }

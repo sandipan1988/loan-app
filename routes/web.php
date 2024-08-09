@@ -39,6 +39,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 	Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
+    Route::get('/amortization-schedule/{id}', [App\Http\Controllers\LoanController::class, 'getScheduleById'])->name('amortization-schedule');
+
 
 
 });

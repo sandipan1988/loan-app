@@ -19,14 +19,25 @@ class LoanController extends Controller
      */
     public function index(Loan $loan)
     {
-        $loans = $loan->schedules()->paginate(15);
-        echo "<pre/>";
+        $loans = $loan->paginate(15);
+        /*echo "<pre/>";
         print_r($loans);
-        exit;
+        exit;*/
 
 
 
         return view('loans.index', ['loans' => $loans]);
+    }
+
+    public function getScheduleById($loan_id)
+    {
+        $loan = Loan::with('schedules')->find($loan_id);
+        /*echo "<pre/>";
+        print_r($loan);
+        exit;
+        */
+        $interest = Interests::where('loan_id', $loan_id)->first();
+        return view('loans.amortization', ['loans' => $loan, 'interest' => $interest]);
     }
 
     public function add()
