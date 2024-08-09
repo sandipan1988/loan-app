@@ -20,9 +20,7 @@ class LoanController extends Controller
     public function index(Loan $loan)
     {
         $loans = $loan->schedules()->paginate(15);
-        echo "<pre/>";
-        print_r($loans);
-        exit;
+       dd($loans);
 
 
 
@@ -45,6 +43,7 @@ class LoanController extends Controller
     public function post(Request $request)
     {
 
+
         $loan = new Loan;
         $loan->name = $request->input('name');
         $loan->email = $request->input('email');
@@ -53,6 +52,7 @@ class LoanController extends Controller
         $loan->loan_type = $request->input('loan_type');
 
         $loan->interest_rate = $request->input('interest_rate');
+
 
         if ($loan->interest_rate == "other") {
             $loan->interest_rate = $request->other_interest_value;
@@ -63,6 +63,7 @@ class LoanController extends Controller
 
 
         $loan->loan_amount = $request->input('loan_amount');
+
 
         $loan->installment_amount = $request->input('installment_amount');
 
@@ -119,7 +120,8 @@ class LoanController extends Controller
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
                 $schedule->installment_amount = $loan->installment_amount;
-                $schedule->installment_date = $installment_date;
+               $schedule->installment_date = $installment_date;
+
                 $schedule->save();
             }
         } else {
