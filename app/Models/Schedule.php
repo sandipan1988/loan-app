@@ -13,6 +13,16 @@ class Schedule extends Model
 
     public function loan()
     {
-        return $this->belongsTo(Loan::class);
+        return $this->belongsTo(Loan::class,'loan_id');
     }
+
+    /**
+ * The attributes that should be cast.
+ *
+ * @var array
+ */
+protected $casts = [
+    'installment_date' => 'date:Y-m-d',
+    'paid_date' => 'date:Y-m-d',
+];
 }
