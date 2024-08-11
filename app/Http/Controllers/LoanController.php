@@ -70,7 +70,7 @@ class LoanController extends Controller
     $loan->loan_amount = $request->input('loan_amount');
 
 
-    $loan->installment_amount = $request->input('installment_amount');
+   $loan->installment_amount = $request->input('installment_amount');
 
 
 
@@ -87,6 +87,8 @@ class LoanController extends Controller
     $loan->save();
 
     $loan_id = $loan->loan_id;
+    // delete existing schedule
+    Schedule::where('loan_id',$loan_id)->delete();
 
     $start = Carbon::parse($loan->loan_start_date);
     if ($loan->loan_type == "1") {
@@ -105,6 +107,7 @@ class LoanController extends Controller
             $installment_date = $start->addRealDays($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
+            $loan->installment_amount;
             $schedule->installment_amount = $loan->installment_amount;
             $schedule->installment_date = $installment_date;
             $schedule->save();
@@ -157,7 +160,7 @@ class LoanController extends Controller
 
     public function edit($loan_id)
     {
-        dd($loan_id);
+       // dd($loan_id);
 
         $loan = Loan::find($loan_id);
 
