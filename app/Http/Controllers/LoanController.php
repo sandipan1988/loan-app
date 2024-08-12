@@ -160,9 +160,10 @@ class LoanController extends Controller
 
     public function edit($loan_id)
     {
-       // dd($loan_id);
+
 
         $loan = Loan::find($loan_id);
+        //dd($loan);
 
         return view('loans.edit', ['loan'=>$loan]);
     }

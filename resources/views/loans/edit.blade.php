@@ -1,6 +1,5 @@
 @extends('layouts.app', ['activePage' => 'edit', 'title' => 'Light Bootstrap Dashboard Laravel by Creative Tim &
 UPDIVISION', 'navName' => 'Loan', 'activeButton' => 'laravel'])
-
 @section('content')
 <div class="content">
     <div class="container-fluid">
@@ -92,9 +91,10 @@ UPDIVISION', 'navName' => 'Loan', 'activeButton' => 'laravel'])
                                 <div class="form-group row">
                                     <label for="loan-start-date" class="col-md-4 col-form-label text-md-right">Loan
                                         Start Date</label>
+
                                     <div class="col-md-2">
                                         <input type="date" class="form-control" id="loan-start-date"
-                                            name="loan_start_date"  value="{{ old('loan_start_date', $loan->loan_start_date->format('d/m/Y')) }}">
+                                            name="loan_start_date"  value="{{ $loan->loan_start_date ?  $loan->loan_start_date->format('Y-m-d') :''}}">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-0">
