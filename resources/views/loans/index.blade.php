@@ -16,6 +16,16 @@
                                 <p class="text-sm mb-0">
                                     This is loan management.
                                 </p>
+                                @if (session('success'))
+                                <div class="alert alert-primary">
+                                    {{ session('success') }}
+                                </div>
+                                @endif
+                                @if (session('alert-error'))
+                                <div class="alert alert-success">
+                                    {{ session('alert-error') }}
+                                </div>
+                                @endif
                             </div>
                             <div class="col-4 text-right">
                                 <a href="{{route('add-loan')}}" class="btn btn-sm btn-default">Add Loan</a>
@@ -67,7 +77,7 @@
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
 
                                         <td class="d-flex ">
-                                               <a href="{{route('edit-loan')}}"><i class="fa fa-edit" title="Edit Loan"></i></a>
+                                               <a href="{{route('edit-loan',$loan->loan_id)}}"><i class="fa fa-edit" title="Edit Loan"></i></a>
                                                <a href="{{route('del-loan')}}"><i class="fa fa-trash" title="Delete Loan"></i></a>
                                                <a href="{{route('del-loan')}}"><i class="fa fa-download" aria-hidden="true" title="Download Statement"></i></a>
                                         </td>
