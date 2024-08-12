@@ -94,7 +94,7 @@ UPDIVISION', 'navName' => 'Loan', 'activeButton' => 'laravel'])
 
                                     <div class="col-md-2">
                                         <input type="date" class="form-control" id="loan-start-date"
-                                            name="loan_start_date"  value="{{ $loan->loan_start_date ?  $loan->loan_start_date->format('Y-m-d') :''}}">
+                                            name="loan_start_date"  value="{{ $loan->loan_start_date ? $loan->loan_start_date->format('Y-m-d') :''}}">
                                     </div>
                                 </div>
                                 <div class="form-group row mb-0">
