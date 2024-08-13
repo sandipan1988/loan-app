@@ -72,14 +72,14 @@
 
                                         <td>
                                         <a href="{{route('amortization-schedule',$loan->loan_id)}}"><i class="fa fa-inr" title="Amortization schedule" aria-hidden="true"></i></a>
-                                        <a href="{{route('del-loan')}}"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
+                                        <a href="#"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
                                         </td>
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
 
                                         <td class="d-flex ">
                                                <a href="{{route('edit-loan',$loan->loan_id)}}"><i class="fa fa-edit" title="Edit Loan"></i></a>
-                                               <a href="{{route('del-loan')}}"><i class="fa fa-trash" title="Delete Loan"></i></a>
-                                               <a href="{{route('del-loan')}}"><i class="fa fa-download" aria-hidden="true" title="Download Statement"></i></a>
+                                               <a href="{{route('del-loan',$loan->loan_id)}}"><i class="fa fa-trash" title="Delete Loan"></i></a>
+                                               <a href="{{route('del-loan',$loan->loan_id)}}"><i class="fa fa-download" aria-hidden="true" title="Download Statement"></i></a>
                                         </td>
                                     </tr>
                                     @endforeach
