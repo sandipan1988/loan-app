@@ -160,16 +160,23 @@ class LoanController extends Controller
 
     public function edit($loan_id)
     {
-       // dd($loan_id);
+
 
         $loan = Loan::find($loan_id);
+        //dd($loan);
 
         return view('loans.edit', ['loan'=>$loan]);
     }
 
-    public function delete()
+    public function delete($loan_id)
     {
-        //return view('loans.add', []);
+        $loan = Loan::find($loan_id);
+        if($loan)
+        foreach($loan->schedules as $schedule){
+        $schedule->delete();
+        }
+        $loan->delete();
+        return redirect()->route('loan')->with('success','data deleted successfully');
     }
 
     public function post(Request $request)

@@ -36,7 +36,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/submit-loan', [App\Http\Controllers\LoanController::class, 'post'])->name('submit-loan');
 	Route::get('/edit-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'edit'])->name('edit-loan');
     Route::patch('/update-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'update'])->name('update-loan');
-	Route::get('/del-loan', [App\Http\Controllers\LoanController::class, 'delete'])->name('del-loan');
+	Route::get('/del-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'delete'])->name('del-loan');
 
 
 	Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
