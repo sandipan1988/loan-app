@@ -3,11 +3,14 @@
 @section('content')
     <div class="content">
         <div class="container-fluid">
+            <form method="POST" action="{{ route('search-schedule') }}">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">Search
                             <div class="row">
+
+                                    @csrf
                                 <div class="col-4">
                                     <div class="row">
                                         <div class="col-2">
@@ -15,7 +18,7 @@
                                         </div>
                                         <div class="col-8">
                                             <input type="text" id="name" class="form-control" name="name"
-                                                required="">
+                                                >
                                         </div>
                                     </div>
                                 </div>
@@ -26,13 +29,14 @@
                                         </div>
                                         <div class="col-3">
                                             <input type="date" class="form-control" id="date-of-birth"
-                                                name="date-of-birth">
+                                                name="search-date">
                                         </div>
                                         <div class="col-4">
-                                            <a href="" class="btn btn-sm btn-default mt-2">SEARCH</a>
+                                            <button type="submit" class="btn btn-sm btn-default mt-2">SEARCH</button>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                         <div class="col-12 mt-2">
@@ -40,10 +44,19 @@
                     </div>
                 </div>
             </div>
+        </form>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card data-tables">
-
+                        @if (!empty($message['success']) && $message['success'])
+                            <div class="alert alert-primary">
+                                {{ $message['message'] }}
+                            </div>
+                        @elseif(!empty($message['success']) && $message['success'] == false)
+                            <div class="alert alert-error">
+                                {{ $message['message'] }}
+                            </div>
+                        @endif
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-8">
@@ -53,7 +66,12 @@
                                     </p>
                                 </div>
                                 <div class="col-4 text-right">
-                                    <a href="" class="btn btn-sm btn-default">Submit</a>
+                                    <form method="POST" action="{{ route('submit-schedule') }}">
+                                        @csrf
+                                        <input type="hidden" name="schedule_ids" value="" id="schedule_ids" />
+                                        <button class="btn btn-sm btn-default">Submit</Button>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
@@ -68,59 +86,43 @@
                             <table class="table table-hover table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Account No.</th>
                                         <th>Name</th>
+                                        <th>Mobile</th>
+                                        <th>Account No.</th>
                                         <th>Installment Amount</th>
-                                        <th>Date</th>
-                                        <th>Paid <input type="checkbox" name="all-chk" class="check-space" id="paid1" />
+                                        <th>Imnstallment Date</th>
+                                        <th>Paid Status</th>
+                                        <th>Pay <input type="checkbox" class="" id="paid1"
+                                                onClick="check_uncheck_checkbox(this.checked);" />
                                         </th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Account No.</th>
-                                        <th>Name</th>
-                                        <th>Installment Amount</th>
-                                        <th>Date</th>
-                                        <th>Paid <input type="checkbox" name="all-chk" class="check-space" id="paid2" />
-                                        </th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
 
-                                    <tr>
-                                        <td>A0000001</td>
-                                        <td>SK</td>
-                                        <td>300</td>
-                                        <td>2024-02-25</td>
-                                        <td class="">
-                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="all-chk"
-                                                class="check-space" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>A0000002</td>
-                                        <td>SB</td>
-                                        <td>2000</td>
-                                        <td>2024-02-25</td>
-                                        <td class="">
-                                            <input type="checkbox" name="all-chk" class="check-space" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>A0000003</td>
-                                        <td>SA</td>
-                                        <td>10000</td>
-                                        <td>2024-02-25</td>
-                                        <td class="">
-                                            <input type="checkbox" name="all-chk" class="check-space" />
-                                        </td>
-                                    </tr>
+                                <tbody>
+                                    @foreach ($schedules as $schedule)
+                                        <tr>
+                                            <td>{{ $schedule->loan->name }}</td>
+                                            <td>{{ $schedule->loan->phone }}</td>
+                                            <td>{{ $schedule->loan->loan_account }}</td>
+                                            <td>{{ $schedule->installment_amount }}</td>
+                                            <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>
+                                            <td>{{ $schedule->is_paid }}</td>
+                                            <td class="">
+                                                @if($schedule->is_paid !="YES")
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="all-chk"
+                                                    value="{{ $schedule->schedule_id }}" class="check-space"
+                                                    onClick="single(this.checked,'{{ $schedule->schedule_id }}')" />
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                {{$schedules->links()}}
+
             </div>
 
         </div>
@@ -128,17 +130,41 @@
 @endsection
 @push('js')
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('#paid1,#paid2').click( function() {
-                if(this.checked){
-                    $(".check-space").attr('checked', 'checked');
-                }
-                else{
-                    $(".check-space").removeAttr('checked');
-                }
+        function check_uncheck_checkbox(isChecked) {
+            arr = [];
+            if (isChecked) {
+                $('input[name="all-chk"]').each(function() {
+                    this.checked = true;
+                    arr.push($(this).val());
+                });
+            } else {
+                $('input[name="all-chk"]').each(function() {
+                    this.checked = false;
+                    arr.pop($(this).val());
+                });
+            }
+            $("#schedule_ids").val(arr.join(','));
+
+        }
 
 
-            });
-        });
+        function single(checked, id) {
+            arr1 = $("#schedule_ids").val().split(",");
+
+            if (checked) {
+                if (!arr1.includes(id))
+                    arr1.push(id);
+
+            } else {
+                console.log(arr1);
+
+                const index = arr1.indexOf(id);
+
+                arr1.splice(index, 1);
+                console.log(arr1);
+             }
+            $("#schedule_ids").val(arr1.join(','));
+
+        }
     </script>
 @endpush

@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\Schedule;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+use function PHPSTORM_META\exitPoint;
 
 class LoanController extends Controller
 {
@@ -19,7 +22,7 @@ class LoanController extends Controller
      */
     public function index(Loan $loan)
     {
-        $loans = $loan->paginate(15);
+        $loans = $loan->paginate(10);
         /*echo "<pre/>";
         print_r($loans);
         exit;*/
@@ -31,10 +34,35 @@ class LoanController extends Controller
 
     public function getScheduleById($loan_id)
     {
-        $loan = Loan::with('schedules')->find($loan_id);
+        $loans = Loan::where('loan_id',$loan_id)->first();
 
+
+        $schedules= Schedule::where('loan_id', $loan_id)->paginate(10);
+
+        //dd($schedules); exit;
         $interest = Interests::where('loan_id', $loan_id)->first();
-        return view('loans.amortization', ['loans' => $loan, 'interest' => $interest]);
+
+
+        return view('loans.amortization', ['loans' => $loans, 'schedules' => $schedules, 'interest' => $interest]);
+    }
+
+    public function getScheduleDownload($loan_id)
+    {
+        $loans = Loan::where('loan_id', $loan_id)->first();
+
+        //dd($loans); exit;
+        $schedules= Schedule::where('loan_id', $loan_id)->get();
+
+        //dd($schedules); exit;
+        $interest = Interests::where('loan_id', $loan_id)->first();
+
+        $filename='amortization-'.$loans->name.'-'.time().'.pdf';
+
+        $pdf = Pdf::loadView('loans.amortizationPDF', ['loans' => $loans, 'schedules' => $schedules, 'interest' => $interest]);
+
+        return $pdf->stream($filename);
+        return $pdf->download($filename);
+
     }
     public function add()
     {
@@ -90,7 +118,7 @@ class LoanController extends Controller
     // delete existing schedule
     Schedule::where('loan_id',$loan_id)->delete();
 
-    $start = Carbon::parse($loan->loan_start_date);
+
     if ($loan->loan_type == "1") {
 
         $interest = $loan->loan_amount*$loan->interest_rate*0.01;
@@ -104,6 +132,7 @@ class LoanController extends Controller
         $int_obj->save();
         //Daily
         for ($i = 0; $i <= $n; $i++) {
+            $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealDays($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
@@ -125,6 +154,7 @@ class LoanController extends Controller
         $int_obj->save();
         //Weekly
         for ($i = 0; $i <= $n; $i++) {
+            $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealWeeks($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
@@ -146,6 +176,7 @@ class LoanController extends Controller
         $int_obj->save();
         //monthly
         for ($i = 0; $i <= $n; $i++) {
+            $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealMonths($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
@@ -221,7 +252,9 @@ class LoanController extends Controller
 
         $loan_id = $loan->loan_id;
 
-        $start = Carbon::parse($loan->loan_start_date);
+         $loan->loan_type;
+
+
         if ($loan->loan_type == "1") {
 
             $interest = $loan->loan_amount*$loan->interest_rate*0.01;
@@ -235,13 +268,17 @@ class LoanController extends Controller
             $int_obj->save();
             //Daily
             for ($i = 0; $i <= $n; $i++) {
+                $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealDays($i)->toDateString();
+
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
                 $schedule->installment_amount = $loan->installment_amount;
                 $schedule->installment_date = $installment_date;
                 $schedule->save();
             }
+
+
         } elseif ($loan->loan_type == "2") {
 
             $interest = $loan->loan_amount*$loan->interest_rate*0.01;
@@ -255,6 +292,7 @@ class LoanController extends Controller
             $int_obj->save();
             //Weekly
             for ($i = 0; $i <= $n; $i++) {
+                $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealWeeks($i)->toDateString();
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
@@ -276,6 +314,7 @@ class LoanController extends Controller
             $int_obj->save();
             //monthly
             for ($i = 0; $i <= $n; $i++) {
+                $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealMonths($i)->toDateString();
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;

@@ -64,7 +64,7 @@
                                         <td>{{ $loan->name }}</td>
                                         <td>{{ $loan->loan_account }}</td>
                                         <td>{{ $loan->phone }}</td>
-                                        <td>{{ $loan->loan_type }}</td>
+                                        <td>{{ Helper::getLoanType($loan->loan_type) }}</td>
                                         <td>{{ $loan->interest_rate }} &percnt;</td>
                                         <td>{{ $loan->loan_amount }}</td>
                                         <td>{{ $loan->installment_amount }}</td>
@@ -72,7 +72,7 @@
 
                                         <td>
                                         <a href="{{route('amortization-schedule',$loan->loan_id)}}"><i class="fa fa-inr" title="Amortization schedule" aria-hidden="true"></i></a>
-                                        <a href="#"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
+                                        <a href="{{route('amortization-schedule-dowload',$loan->loan_id)}}"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
                                         </td>
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
 
@@ -88,6 +88,7 @@
                     </div>
                 </div>
             </div>
+            {{$loans->links()}}
         </div>
 
     </div>

@@ -18,12 +18,6 @@ Tip 2: you can also add an image using data-image tag
                 </a>
             </li>
 
-            <li class="nav-item @if($activePage == 'members') active @endif">
-                <a class="nav-link" href="{{route('member')}}">
-                    <i class="nc-icon nc-notes"></i>
-                    <p>{{ __("Members") }}</p>
-                </a>
-            </li>
 
             <li class="nav-item @if($activePage == 'loan') active @endif">
                 <a class="nav-link" href="{{route('loan')}}">
@@ -31,7 +25,7 @@ Tip 2: you can also add an image using data-image tag
                     <p>{{ __("Loans") }}</p>
                 </a>
             </li>
-           
+
             <li class="nav-item">
                 <a class="nav-link" data-toggle="collapse" href="#laravelExamples" @if($activeButton =='laravel') aria-expanded="true" @endif>
                     <i>
@@ -56,7 +50,7 @@ Tip 2: you can also add an image using data-image tag
                                 <p>{{ __("User Profile") }}</p>
                             </a>
                         </li>
-                        
+
                     </ul>
                 </div>
             </li>
@@ -73,20 +67,20 @@ Tip 2: you can also add an image using data-image tag
                     <p>{{ __("Schedule") }}</p>
                 </a>
             </li>
-            <li class="nav-item @if($activePage == 'icons') active @endif">
+            <li class="nav-item @if($activePage == 'reports') active @endif">
                 <a class="nav-link" href="{{route('page.index', 'icons')}}">
                     <i class="nc-icon nc-atom"></i>
-                    <p>{{ __("Icons") }}</p>
+                    <p>{{ __("Reports") }}</p>
                 </a>
             </li>
-            
-            <li class="nav-item @if($activePage == 'notifications') active @endif">
+
+            <!--<li class="nav-item @if($activePage == 'notifications') active @endif">
                 <a class="nav-link" href="{{route('page.index', 'notifications')}}">
                     <i class="nc-icon nc-bell-55"></i>
                     <p>{{ __("Notifications") }}</p>
                 </a>
-            </li>
-            
+            </li> -->
+
         </ul>
     </div>
 </div>
