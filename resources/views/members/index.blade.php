@@ -1,5 +1,5 @@
-@extends('layouts.app', ['activePage' => 'members', 
-'title' => 'Members', 
+@extends('layouts.app', ['activePage' => 'members',
+'title' => 'Members',
 'navName' => 'Members', 'activeButton' => 'laravel'])
 
 @section('content')
@@ -46,7 +46,7 @@
                                 </tr>
                             </tfoot>
                             <tbody>
-                            
+
                                     <tr>
                                         <td>Admin Admin</td>
                                         <td>admin@lightbp.com</td>
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </div>
-     
+
     </div>
 </div>
-@endsection              
+@endsection

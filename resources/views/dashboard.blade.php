@@ -13,10 +13,11 @@
                       <i class="nc-icon nc-single-02 text-warning"></i>
                     </div>
                   </div>
+
                   <div class="col-7 col-md-8">
                     <div class="numbers">
                       <p class="card-category">Members</p>
-                      <p class="card-title">2000<p>
+                      <p class="card-title">{{ $allmembers }}<p>
                     </div>
                   </div>
                 </div>
@@ -24,8 +25,8 @@
               <div class="card-footer ">
                 <hr>
                 <div class="stats">
-                  <i class="fa fa-refresh"></i>
-                  Update Now
+                  {{-- <i class="fa fa-refresh"></i>
+                  Update Now --}}
                 </div>
               </div>
             </div>
@@ -42,7 +43,7 @@
                   <div class="col-7 col-md-8">
                     <div class="numbers">
                       <p class="card-category">Active Loan</p>
-                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>50,000<p>
+                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>{{ $loans }}<p>
                     </div>
                   </div>
                 </div>
@@ -68,7 +69,7 @@
                   <div class="col-7 col-md-8">
                     <div class="numbers">
                       <p class="card-category">Overdue</p>
-                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>23,000<p>
+                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>{{ $overdue }}<p>
                     </div>
                   </div>
                 </div>
@@ -88,13 +89,15 @@
                 <div class="row">
                   <div class="col-5 col-md-4">
                     <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-paper-2 text-primary"></i>
+                        <a href="{{ route('schedule') }}"> <i class="nc-icon nc-paper-2 text-primary"></i>
+                        </a>
                     </div>
                   </div>
                   <div class="col-7 col-md-8">
                     <div class="numbers">
-                      <p class="card-category">Due Today</p>
-                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>3,000<p>
+                        <a href="{{ route('schedule') }}"><p class="card-category">Due Today</p>
+                      <p class="card-title"><i class="fa fa-inr" aria-hidden="true"></i>{{ $duetoday }}<p>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -102,14 +105,14 @@
               <div class="card-footer ">
                 <hr>
                 <div class="stats">
-                  <i class="fa fa-refresh"></i>
-                  Update now
+                  {{-- <i class="fa fa-refresh"></i>
+                  Update now --}}
                 </div>
               </div>
             </div>
           </div>
         </div>
-            
+
         </div>
     </div>
 @endsection
