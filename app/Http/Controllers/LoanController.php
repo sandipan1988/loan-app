@@ -60,7 +60,7 @@ class LoanController extends Controller
 
         $pdf = Pdf::loadView('loans.amortizationPDF', ['loans' => $loans, 'schedules' => $schedules, 'interest' => $interest]);
 
-        return $pdf->stream($filename);
+        //return $pdf->stream($filename);
         return $pdf->download($filename);
 
     }
@@ -326,4 +326,24 @@ class LoanController extends Controller
 
         return redirect(route('loan'))->with('success','loan added successdully');
     }
+
+    public function getStatement($loan_id)
+    {
+       $loans  = Loan::where('loan_id', $loan_id)->first();
+
+        //dd($loans); exit;
+        $schedules= Schedule::where('loan_id', $loan_id)->where('is_paid','YES')->get();
+
+        //dd($schedules); exit;
+        $interest = Interests::where('loan_id', $loan_id)->first();
+        //return view('loans.statement',  ['loans' => $loans, 'schedules' => $schedules, 'interest' => $interest]);
+        $filename='Stmnt-'.$loans->name.'-'.time().'.pdf';
+
+        $pdf = Pdf::loadView('loans.statement', ['loans' => $loans, 'schedules' => $schedules, 'interest' => $interest]);
+
+        //return $pdf->stream($filename);
+        return $pdf->download($filename);
+    }
+
+    //public function getStatement()
 }

@@ -44,7 +44,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/submit-schedule', [App\Http\Controllers\ScheduleController::class, 'post'])->name('submit-schedule');
     Route::post('/search-schedule', [App\Http\Controllers\ScheduleController::class, 'search'])->name('search-schedule');
     Route::get('/amortization-schedule-download/{id}', [App\Http\Controllers\LoanController::class, 'getScheduleDownload'])->name('amortization-schedule-dowload');
-
+    Route::get('/stmnt-download/{id}', [App\Http\Controllers\LoanController::class, 'getStatement'])->name('stmnt-download');
 
 
 });

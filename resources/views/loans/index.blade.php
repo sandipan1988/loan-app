@@ -79,7 +79,7 @@
                                         <td class="d-flex ">
                                                <a href="{{route('edit-loan',$loan->loan_id)}}"><i class="fa fa-edit" title="Edit Loan"></i></a>
                                                <a href="{{route('del-loan',$loan->loan_id)}}"><i class="fa fa-trash" title="Delete Loan"></i></a>
-                                               <a href="{{route('del-loan',$loan->loan_id)}}"><i class="fa fa-download" aria-hidden="true" title="Download Statement"></i></a>
+                                               <a href="{{route('stmnt-download',$loan->loan_id)}}"><i class="fa fa-download" aria-hidden="true" title="Download Statement"></i></a>
                                         </td>
                                     </tr>
                                     @endforeach
