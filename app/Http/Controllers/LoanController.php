@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 use function PHPSTORM_META\exitPoint;
 
+
 class LoanController extends Controller
 {
     /**
@@ -206,6 +207,11 @@ class LoanController extends Controller
         foreach($loan->schedules as $schedule){
         $schedule->delete();
         }
+        $interest = Interests::where('interests.loan_id','=', $loan_id);
+
+            $interest->delete();
+
+
         $loan->delete();
         return redirect()->route('loan')->with('success','data deleted successfully');
     }
