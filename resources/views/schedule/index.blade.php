@@ -17,8 +17,8 @@
                                             <label for="name" class="col-form-label text-md-right">By Name</label>
                                         </div>
                                         <div class="col-8">
-                                            <input type="text" id="name" class="form-control" name="name"
-                                                >
+                                            <input type="text" id="name" class="form-control" name="name" value="{{$name}}">
+                                            <input type="hidden" id="phone" class="form-control" name="phone" value="{{$phone}}">
                                         </div>
                                     </div>
                                 </div>
@@ -29,7 +29,7 @@
                                         </div>
                                         <div class="col-3">
                                             <input type="date" class="form-control" id="date-of-birth"
-                                                name="search-date">
+                                                name="search-date" value="{{ $search_date ? $search_date->format('Y-m-d') :''}}" required>
                                         </div>
                                         <div class="col-4">
                                             <button type="submit" class="btn btn-sm btn-default mt-2">SEARCH</button>
@@ -101,8 +101,8 @@
                                 <tbody>
                                     @foreach ($schedules as $schedule)
                                         <tr>
-                                            <td>{{ $schedule->loan->name }}</td>
-                                            <td>{{ $schedule->loan->phone }}</td>
+                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</td>
+                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
                                             <td>{{ $schedule->loan->loan_account }}</td>
                                             <td>{{ $schedule->installment_amount }}</td>
                                             <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>
@@ -167,4 +167,54 @@
 
         }
     </script>
+@endpush
+@push('js')
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $('#date-of-birth').on('click', function(){
+            $(this).val('');
+        });
+        $('#name').autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('find-by-name')}}", // Replace with your server-side script URL
+                    dataType: 'json',
+                    method: "POST",
+                    data: {
+                        name: request.term
+                    },
+                    success: function(data) {
+                        var names = [];
+                        for (var i = 0; i < data.length; i++) {
+                            names[i] = data[i].name + ", " + data[i].phone;
+
+                        }
+                        response(names);
+                    }
+                });
+            },
+            focus: function() {
+                // prevent value inserted on focus
+                return false;
+            },
+            minLength: 2, // Minimum number of characters to trigger the auto-suggestion,
+
+            select: function(event, ui) {
+               // console.log(ui.item);
+                event.preventDefault();
+                var name = ui.item.value.split(",")[0];
+                var phone = ui.item.value.split(", ")[1];
+                $('#name').val(name);
+                $('#phone').val(phone);
+                
+            },
+           
+
+        });
+    });
+</script>
 @endpush

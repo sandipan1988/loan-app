@@ -28,14 +28,14 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $allmembers = User::count();
+        $allmembers = Loan::count();
         $loans = Loan::sum('loan_amount');
         $duetoday = Schedule::where('installment_date',today())
-                    ->where('is_paid','no')
+                    ->where('is_paid','NO')
                     ->sum('installment_amount');
 
         $overdue = DB::table('schedules')
-                 ->where('schedules.is_paid','no')
+                 ->where('schedules.is_paid','NO')
                  ->sum('schedules.installment_amount');
         return view('dashboard',compact('allmembers','loans','overdue','duetoday'));
     }

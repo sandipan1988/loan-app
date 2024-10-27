@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Interests;
-use App\Models\User;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\Schedule;
@@ -21,17 +21,50 @@ class LoanController extends Controller
      * @param  \App\Models\User  $model
      * @return \Illuminate\View\View
      */
-    public function index(Loan $loan)
+    public function index(Request $request)
     {
-        $loans = $loan->paginate(10);
-        /*echo "<pre/>";
-        print_r($loans);
-        exit;*/
+        
 
+        if ($request->search == 1) {
 
+            if (!empty($request->name)) {
 
-        return view('loans.index', ['loans' => $loans]);
+                $name = $request->name;
+
+                $loans = Loan::with('members')->whereHas(
+                    'members',
+                    function ($query) use ($name) {
+                        $query->where('name', $name);
+                    }
+                )->get();
+
+                $data = [
+                    'loans' => $loans,
+                    'name' => $request->name,
+                    'search' => '1'
+                ];
+            } 
+
+        }else{
+
+            $loans = Loan::with('members')->paginate(10);
+            $data = [
+                'loans' => $loans,
+                'name' => '',
+                'search' => ''
+            ];
+        }
+       
+
+        return view('loans.index', $data);
     }
+
+    public function findByName(Request $request){
+        $name = $request->input('name');
+        $members = Member::where('name', 'like', '%' . $name . '%')->get();
+        return response()->json($members);
+    }
+    
 
     public function getScheduleById($loan_id)
     {
@@ -78,11 +111,18 @@ class LoanController extends Controller
         return redirect()->route('loan')->with('error', 'Loan not found.');
     }
 
+     // delete existing schedule
+     Schedule::where('loan_id',$loan_id)->delete();
 
-    $loan->name = $request->input('name');
-    $loan->email = $request->input('email');
-    $loan->phone = $request->input('phone');
-    $loan->address = $request->input('address');
+     // delete existing interest
+     Interests::where('loan_id',$loan_id)->delete();
+
+    $phone = $request->input('phone');
+
+    // find member id by phone
+    $member = Member::where('phone', $phone)->first();
+    $loan->member_id = $member->member_id;
+    
     $loan->loan_type = $request->input('loan_type');
 
     $loan->interest_rate = $request->input('interest_rate');
@@ -94,17 +134,7 @@ class LoanController extends Controller
 
     $loan->interest_rate = trim($loan->interest_rate);
 
-
-
     $loan->loan_amount = $request->input('loan_amount');
-
-
-   $loan->installment_amount = $request->input('installment_amount');
-
-
-
-    //No. of installment
-    $n = ceil(doubleval($loan->loan_amount / $loan->installment_amount));
 
     $random = mt_rand(10000000, 99999999);
 
@@ -112,15 +142,16 @@ class LoanController extends Controller
 
     $loan->loan_start_date = $request->input('loan_start_date');
 
-
-    $loan->save();
-
-    $loan_id = $loan->loan_id;
-    // delete existing schedule
-    Schedule::where('loan_id',$loan_id)->delete();
-
-
+    
     if ($loan->loan_type == "1") {
+
+        //No. of installment
+        $N=100;
+        $installment_amount = doubleval($loan->loan_amount / 100);
+
+        $loan->installment_amount = $installment_amount;
+
+        $loan->save();
 
         $interest = $loan->loan_amount*$loan->interest_rate*0.01;
 
@@ -132,41 +163,70 @@ class LoanController extends Controller
 
         $int_obj->save();
         //Daily
-        for ($i = 0; $i <= $n; $i++) {
+        for ($i = 1; $i <= $N; $i++) {
             $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealDays($i)->toDateString();
+
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
-            $loan->installment_amount;
-            $schedule->installment_amount = $loan->installment_amount;
+            $schedule->installment_amount = $installment_amount;
             $schedule->installment_date = $installment_date;
+            $loan_end_date = $installment_date;
             $schedule->save();
         }
+
+     //update loan last date
+      $loan->loan_end_date = $loan_end_date;
+      $loan->save();
+
     } elseif ($loan->loan_type == "2") {
+
+         //No. of installment
+         $N=ceil(doubleval(100/7));
+
+        $installment_amount = 7*doubleval($loan->loan_amount / 100);
+        $loan->installment_amount = $installment_amount;
+
+        $loan->save();
 
         $interest = $loan->loan_amount*$loan->interest_rate*0.01;
 
         $int_obj = new Interests();
-
         $int_obj->loan_id = $loan_id;
 
         $int_obj->interest_amount = $interest;
 
         $int_obj->save();
+        $sum_of_installment = 0;
         //Weekly
-        for ($i = 0; $i <= $n; $i++) {
+        for ($i = 1; $i <= $N; $i++) {
             $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealWeeks($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
-            $schedule->installment_amount = $loan->installment_amount;
-           $schedule->installment_date = $installment_date;
+            $schedule->installment_date = $installment_date;
+            $loan_end_date = $installment_date;
 
+            $sum_of_installment = $sum_of_installment+$installment_amount;
+
+                if ($sum_of_installment < $loan->loan_amount) {
+                    $schedule->installment_amount = $installment_amount;
+                } else {
+                    $schedule->installment_amount = $loan->loan_amount - $installment_amount*($N-1);
+                }
             $schedule->save();
         }
-    } else {
 
+        $loan->loan_end_date = $loan_end_date;
+        $loan->save();
+    } else {
+        $N = (12*5) ;
         $interest = $loan->loan_amount*$loan->interest_rate*0.01;
+        $installment_amount = $interest;
+        $loan->installment_amount = $installment_amount;
+        $loan->save();
+
+        $loan_id = $loan->loan_id;
 
         $int_obj = new Interests();
 
@@ -176,16 +236,17 @@ class LoanController extends Controller
 
         $int_obj->save();
         //monthly
-        for ($i = 0; $i <= $n; $i++) {
+        for ($i = 0; $i <= $N; $i++) {
             $start = Carbon::parse($loan->loan_start_date);
             $installment_date = $start->addRealMonths($i)->toDateString();
             $schedule = new Schedule();
             $schedule->loan_id = $loan_id;
-            $schedule->installment_amount = $loan->installment_amount;
+            $schedule->installment_amount = $installment_amount;
             $schedule->installment_date = $installment_date;
             $schedule->save();
         }
     }
+
 
     return redirect()->route('loan')->with('success', 'Loan updated successfully.');
 }
@@ -221,11 +282,13 @@ class LoanController extends Controller
 
 
         $loan = new Loan;
-        $loan->name = $request->input('name');
-        $loan->email = $request->input('email');
-        $loan->phone = $request->input('phone');
-        $loan->address = $request->input('address');
+        $phone = trim($request->input('phone'));
+        // find member id by phone
+        $member = Member::where('phone', $phone)->first();
+     
         $loan->loan_type = $request->input('loan_type');
+
+        $loan->member_id = $member->member_id;
 
         $loan->interest_rate = $request->input('interest_rate');
 
@@ -235,18 +298,7 @@ class LoanController extends Controller
         }
 
         $loan->interest_rate = trim($loan->interest_rate);
-
-
-
         $loan->loan_amount = $request->input('loan_amount');
-
-
-        $loan->installment_amount = $request->input('installment_amount');
-
-
-
-        //No. of installment
-        $n = ceil(doubleval($loan->loan_amount / $loan->installment_amount));
 
         $random = mt_rand(10000000, 99999999);
 
@@ -254,14 +306,17 @@ class LoanController extends Controller
 
         $loan->loan_start_date = $request->input('loan_start_date');
 
-        $loan->save();
-
-        $loan_id = $loan->loan_id;
-
-         $loan->loan_type;
-
-
         if ($loan->loan_type == "1") {
+
+            //No. of installment
+            $N=100;
+            $installment_amount = doubleval($loan->loan_amount / 100);
+
+            $loan->installment_amount = $installment_amount;
+
+            $loan->save();
+
+            $loan_id = $loan->loan_id;
 
             $interest = $loan->loan_amount*$loan->interest_rate*0.01;
 
@@ -273,43 +328,73 @@ class LoanController extends Controller
 
             $int_obj->save();
             //Daily
-            for ($i = 0; $i <= $n; $i++) {
+            for ($i = 1; $i <= $N; $i++) {
                 $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealDays($i)->toDateString();
 
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
-                $schedule->installment_amount = $loan->installment_amount;
+                $schedule->installment_amount = $installment_amount;
                 $schedule->installment_date = $installment_date;
+                $loan_end_date = $installment_date;
                 $schedule->save();
             }
-
+            $loan->loan_end_date = $loan_end_date;
+            $loan->save();
 
         } elseif ($loan->loan_type == "2") {
+
+             //No. of installment
+             $N=ceil(doubleval(100/7));
+
+            $installment_amount = 7*doubleval($loan->loan_amount / 100);
+            $loan->installment_amount = $installment_amount;
+
+            $loan->save();
+
+            $loan_id = $loan->loan_id;
 
             $interest = $loan->loan_amount*$loan->interest_rate*0.01;
 
             $int_obj = new Interests();
+
+          
 
             $int_obj->loan_id = $loan_id;
 
             $int_obj->interest_amount = $interest;
 
             $int_obj->save();
+            $sum_of_installment =0;
             //Weekly
-            for ($i = 0; $i <= $n; $i++) {
+            for ($i = 1; $i <= $N; $i++) {
                 $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealWeeks($i)->toDateString();
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
-                $schedule->installment_amount = $loan->installment_amount;
-               $schedule->installment_date = $installment_date;
+               
+                $schedule->installment_date = $installment_date;
+                $loan_end_date = $installment_date;
+                $sum_of_installment = $sum_of_installment+$installment_amount;
+
+                if ($sum_of_installment < $loan->loan_amount) {
+                    $schedule->installment_amount = $installment_amount;
+                } else {
+                    $schedule->installment_amount = $loan->loan_amount - $installment_amount*($N-1);
+                }
 
                 $schedule->save();
             }
+            $loan->loan_end_date = $loan_end_date;
+            $loan->save();
         } else {
-
+            $N = (12*5) ;
             $interest = $loan->loan_amount*$loan->interest_rate*0.01;
+            $installment_amount = $interest;
+            $loan->installment_amount = $installment_amount;
+            $loan->save();
+   
+            $loan_id = $loan->loan_id;
 
             $int_obj = new Interests();
 
@@ -319,18 +404,18 @@ class LoanController extends Controller
 
             $int_obj->save();
             //monthly
-            for ($i = 0; $i <= $n; $i++) {
+            for ($i = 0; $i <= $N; $i++) {
                 $start = Carbon::parse($loan->loan_start_date);
                 $installment_date = $start->addRealMonths($i)->toDateString();
                 $schedule = new Schedule();
                 $schedule->loan_id = $loan_id;
-                $schedule->installment_amount = $loan->installment_amount;
+                $schedule->installment_amount = $installment_amount;
                 $schedule->installment_date = $installment_date;
                 $schedule->save();
             }
         }
 
-        return redirect(route('loan'))->with('success','loan added successdully');
+        return redirect(route('loan'))->with('success','loan added successfully');
     }
 
     public function getStatement($loan_id)

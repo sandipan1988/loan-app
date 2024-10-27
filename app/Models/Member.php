@@ -5,6 +5,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model
 {
+
+    protected $primaryKey = 'member_id';
+
     protected $fillable = [
         'name',
         'email',
@@ -19,5 +22,7 @@ class Member extends Model
         'date_of_birth' => 'date',
         'date_became_member' => 'date',
     ];
+
+
 }
 ?>

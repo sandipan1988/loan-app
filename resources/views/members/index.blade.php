@@ -5,6 +5,43 @@
 @section('content')
 <div class="content">
     <div class="container-fluid">
+    <form method="POST" action="{{ route('member') }}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">Search
+                            <div class="row">
+
+                                    @csrf
+                                <div class="col-4">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <label for="name" class="col-form-label text-md-right">By Name</label>
+                                        </div>
+                                        <div class="col-8">
+                                            <input type="text" id="name" class="form-control" name="name" value="{{!empty($name) ? $name : ''}}">
+                                            <input type="hidden" id="phone" class="form-control" name="phone" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="row">
+                                      
+                                        <div class="col-4">
+                                           <input type="hidden" id="search" class="form-control" name="search" value="1">
+                                            <button type="submit" class="btn btn-sm btn-default mt-2">SEARCH</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-12 mt-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
         <div class="row">
             <div class="col-md-12">
                 <div class="card data-tables">
@@ -24,59 +61,63 @@
                     </div>
 
                     <div class="col-12 mt-2">
-                                                                            </div>
+                    </div>
 
                     <div class="toolbar">
                         <!--        Here you can write extra buttons/actions for the toolbar              -->
                     </div>
+                    @if (session('success'))
+                    <div class="alert alert-primary">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+                    @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                    @endif
                     <div class="card-body table-full-width table-responsive">
                         <table class="table table-hover table-striped">
                             <thead>
-                                <tr><th>Name</th>
-                                <th>Email</th>
-                                <th>Start</th>
-                                <th>Actions</th>
-                            </tr></thead>
-                            <tfoot>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Start</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </tfoot>
-                            <tbody>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Date of Birth</th>
+                                    <th>Date Became Member</th>
+                                    <th>Photo</th>
+                                    <th>Action</th>
 
-                                    <tr>
-                                        <td>Admin Admin</td>
-                                        <td>admin@lightbp.com</td>
-                                        <td>2020-02-25 12:37:04</td>
-                                        <td class="d-flex justify-content-end">
-                                               <a href="{{route('edit-member')}}"><i class="fa fa-edit"></i></a>
-                                               <a href="{{route('del-member')}}"><i class="fa fa-trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Admin Admin</td>
-                                        <td>admin@lightbp.com</td>
-                                        <td>2020-02-25 12:37:04</td>
-                                        <td class="d-flex justify-content-end">
-                                               <a href="{{route('edit-member')}}"><i class="fa fa-edit"></i></a>
-                                               <a href="{{route('del-member')}}"><i class="fa fa-trash"></i></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Admin Admin</td>
-                                        <td>admin@lightbp.com</td>
-                                        <td>2020-02-25 12:37:04</td>
-                                        <td class="d-flex justify-content-end">
-                                               <a href="{{route('edit-member')}}"><i class="fa fa-edit"></i></a>
-                                               <a href="{{route('del-member')}}"><i class="fa fa-trash"></i></a>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach($members as $member)
+                                <tr>
+                                    <td>{{$member->name}}</td>
+                                    <td>{{$member->email}}</td>
+                                    <td>{{$member->phone}}</td>
+                                    <td>{{$member->address}}</td>
+                                    <td>{{$member->date_of_birth?->format('d/m/Y')}}</td>
+                                    <td>{{$member->date_became_member?->format('d/m/Y')}}</td>
+                                    @if($member->photo)
+                                    <td><img src="{{asset($member->photo)}}" alt="" style="width: 50px; height: 50px"></td>
+                                    @else
+                                    <td></td>
+                                    @endif
+                                    <td class="d-flex justify">
+                                        <a href="{{route('edit-member', $member->member_id)}}"><i class="fa fa-edit"></i></a>
+                                        <a href="{{route('del-member', $member->member_id)}}"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
+                    @if(empty($search))
+                        {{$members->links()}}
+                    @endif
                 </div>
             </div>
         </div>

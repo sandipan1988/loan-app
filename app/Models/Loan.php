@@ -20,11 +20,17 @@ class Loan extends Model
  */
 protected $casts = [
     'loan_start_date' => 'date:Y-m-d',
+    'loan_end_date' => 'date:Y-m-d',
 ];
 
 public function schedules()
 {
     return $this->hasMany(Schedule::class,'loan_id');
+}
+
+public function members()
+{
+    return $this->belongsTo(Member::class,'member_id');
 }
 
 }

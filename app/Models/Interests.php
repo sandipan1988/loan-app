@@ -9,7 +9,9 @@ class Interests extends Model
 {
     use HasFactory;
 
-    public function loan(){
-        return $this->hasOne(Loan::class);
+
+    public function loan()
+    {
+        return $this->belongsTo(Loan::class, 'loan_id');
     }
 }

@@ -24,15 +24,20 @@
     <title>{{ $title }}</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
         name='viewport' />
+   <meta name="csrf-token" content="{{ csrf_token() }}">
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
     <!-- CSS Files -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/smoothness/jquery-ui.css">
     <link href="{{ asset('light-bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('light-bootstrap/css/light-bootstrap-dashboard.css?v=2.0.0') }} " rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="{{ asset('light-bootstrap/css/demo.css') }}" rel="stylesheet" />
+    
     @vite(['resources/sass/app.scss'])
+
+
 </head>
 
 <body>
@@ -56,14 +61,15 @@
 </body>
 <!--   Core JS Files   -->
 <script src="{{ asset('light-bootstrap/js/core/jquery.3.2.1.min.js') }}" type="text/javascript"></script>
+<script src="http://code.jquery.com/jquery-migrate-3.0.0.min.js" ></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 <script src="{{ asset('light-bootstrap/js/core/popper.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('light-bootstrap/js/core/bootstrap.min.js') }}" type="text/javascript"></script>
 
 <script src="{{ asset('light-bootstrap/js/plugins/jquery.sharrre.js') }}"></script>
 <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
 <script src="{{ asset('light-bootstrap/js/plugins/bootstrap-switch.js') }}"></script>
-<!--  Google Maps Plugin    -->
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+
 <!--  Chartist Plugin  -->
 <script src="{{ asset('light-bootstrap/js/plugins/chartist.min.js') }}"></script>
 <!--  Notifications Plugin    -->
@@ -126,7 +132,49 @@ $(document).ready(function() {
         template: '<i class="fab fa-twitter"></i> Twitter',
         url: 'https://light-bootstrap-dashboard-laravel.creative-tim.com/login'
     });
-});
+
+    $('#name').autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('find-by-name')}}", // Replace with your server-side script URL
+                    dataType: 'json',
+                    method: "POST",
+                    data: {
+                        name: request.term
+                    },
+                    success: function(data) {
+                        var names = [];
+                        for (var i = 0; i < data.length; i++) {
+                            names[i] = data[i].name + ", " + data[i].phone;
+
+                        }
+                        response(names);
+                    }
+                });
+            },
+            focus: function() {
+                // prevent value inserted on focus
+                return false;
+            },
+            minLength: 2, // Minimum number of characters to trigger the auto-suggestion,
+
+            select: function(event, ui) {
+               // console.log(ui.item);
+                event.preventDefault();
+                var name = ui.item.value.split(",")[0];
+                var phone = ui.item.value.split(", ")[1];
+                $('#name').val(name);
+                $('#phone').val(phone);
+                
+            },
+           
+
+        });
+    });
+
 </script>
 
 </html>

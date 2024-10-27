@@ -26,17 +26,21 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('dashboard');
 
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/member', [App\Http\Controllers\MemberController::class, 'index'])->name('member');
+	Route::any('/member', [App\Http\Controllers\MemberController::class, 'index'])->name('member');
 	Route::get('/add-member', [App\Http\Controllers\MemberController::class, 'add'])->name('add-member');
-	Route::get('/edit-member', [App\Http\Controllers\MemberController::class, 'edit'])->name('edit-member');
-	Route::get('/del-member', [App\Http\Controllers\MemberController::class, 'delete'])->name('del-member');
+	Route::post('/save-member', [App\Http\Controllers\MemberController::class, 'save'])->name('save-member');
+	Route::get('/edit-member/{member_id}', [App\Http\Controllers\MemberController::class, 'edit'])->name('edit-member');
+	Route::post('/update-member/{member_id}', [App\Http\Controllers\MemberController::class, 'update'])->name('update-member');
+	Route::get('/del-member/{member_id}', [App\Http\Controllers\MemberController::class, 'delete'])->name('del-member');
 
-	Route::get('/loan', [App\Http\Controllers\LoanController::class, 'index'])->name('loan');
+	Route::any('/loan', [App\Http\Controllers\LoanController::class, 'index'])->name('loan');
 	Route::get('/add-loan', [App\Http\Controllers\LoanController::class, 'add'])->name('add-loan');
 	Route::post('/submit-loan', [App\Http\Controllers\LoanController::class, 'post'])->name('submit-loan');
 	Route::get('/edit-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'edit'])->name('edit-loan');
     Route::patch('/update-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'update'])->name('update-loan');
 	Route::get('/del-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'delete'])->name('del-loan');
+	Route::post('/find-by-name', [App\Http\Controllers\LoanController::class, 'findByName'])->name('find-by-name');
+	
 
 
 	Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
@@ -45,8 +49,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/search-schedule', [App\Http\Controllers\ScheduleController::class, 'search'])->name('search-schedule');
     Route::get('/amortization-schedule-download/{id}', [App\Http\Controllers\LoanController::class, 'getScheduleDownload'])->name('amortization-schedule-dowload');
     Route::get('/stmnt-download/{id}', [App\Http\Controllers\LoanController::class, 'getStatement'])->name('stmnt-download');
-
-
+	Route::get('/due-report', [App\Http\Controllers\ReportController::class, 'getDues'])->name('due-report');
+	Route::any('/interest-report', [App\Http\Controllers\ReportController::class, 'interest'])->name('interest-report');
+	Route::get('/ledger/{member_id}', [App\Http\Controllers\ReportController::class, 'ledger'])->name('ledger');
+	Route::any('/sale-report', [App\Http\Controllers\ReportController::class, 'saleReport'])->name('sale-report');
+	Route::any('/due-report-search', [App\Http\Controllers\ReportController::class, 'searchDues'])->name('due-search');
 });
 
 Route::group(['middleware' => 'auth'], function () {

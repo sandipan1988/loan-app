@@ -17,7 +17,12 @@ Tip 2: you can also add an image using data-image tag
                     <p>{{ __("Dashboard") }}</p>
                 </a>
             </li>
-
+            <li class="nav-item @if($activePage == 'members') active @endif">
+                <a class="nav-link" href="{{route('member')}}">
+                    <i class="nc-icon nc-notes"></i>
+                    <p>{{ __("Members") }}</p>
+                </a>
+            </li>
 
             <li class="nav-item @if($activePage == 'loan') active @endif">
                 <a class="nav-link" href="{{route('loan')}}">
@@ -67,11 +72,40 @@ Tip 2: you can also add an image using data-image tag
                     <p>{{ __("Schedule") }}</p>
                 </a>
             </li>
-            <li class="nav-item @if($activePage == 'reports') active @endif">
-                <a class="nav-link" href="{{route('page.index', 'icons')}}">
-                    <i class="nc-icon nc-atom"></i>
-                    <p>{{ __("Reports") }}</p>
+            
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#report" @if($activeButton =='report') aria-expanded="true" @endif>
+                    <i>
+                        <img src="{{ asset('light-bootstrap/img/laravel.svg') }}" style="width:25px">
+                    </i>
+                    <p>
+                        {{ __("Reports") }}
+                        <b class="caret"></b>
+                    </p>
                 </a>
+                <div class="collapse @if($activeButton =='report') show @endif" id="report">
+                    <ul class="nav">
+                        <li class="nav-item @if($activePage == 'due-report') active @endif">
+                            <a class="nav-link" href="{{Route('due-report')}}">
+                                <i class="nc-icon nc-circle-09"></i>
+                                <p>{{ __("Dues Report") }}</p>
+                            </a>
+                        </li>
+                        <li class="nav-item @if($activePage == 'sale-report') active @endif">
+                            <a class="nav-link" href="{{Route('sale-report')}}">
+                                <i class="nc-icon nc-single-02"></i>
+                                <p>{{ __("Sales Report") }}</p>
+                            </a>
+                        </li>
+                        <li class="nav-item @if($activePage == 'interest-report') active @endif">
+                            <a class="nav-link" href="{{Route('interest-report')}}">
+                                <i class="nc-icon nc-single-02"></i>
+                                <p>{{ __("Interest Report") }}</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
             </li>
 
             <!--<li class="nav-item @if($activePage == 'notifications') active @endif">
