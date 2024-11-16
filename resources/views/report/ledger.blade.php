@@ -59,10 +59,10 @@
                                         <td>{{ Helper::rupee_format($loan->installment_amount) }}</td>
                                         <td>{{ $paid = Helper::getPaid($loan->loan_id) }}</td>
 
-                                        <td>{{ Helper::getDue($loan->loan_amount,$paid) }} </td>
+                                        <td>{{ Helper::getDue($loan->loan_amount, Helper::getPaidForCal($loan->loan_id)) }} </td>
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
 
-                                        <td class="d-flex ">{{ $loan->loan_end_date->format('d/m/Y') }}
+                                        <td class="d-flex ">{{ $loan->loan_end_date?->format('d/m/Y') }}
                                         </td>
                                     </tr>
                                     @endforeach

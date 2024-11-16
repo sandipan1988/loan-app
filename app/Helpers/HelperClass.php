@@ -1,6 +1,8 @@
 <?php // Code within app\Helpers\Helper.php
 
 namespace App\Helpers;
+
+use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Schedule;
 use Carbon\Carbon;
@@ -85,9 +87,25 @@ class HelperClass
         return self::rupee_format($paid_amt);
 
     }
+    public static function getPaidForCal($loan_id){
+        $paid_amt = Schedule::with('loan')->whereHas(
+            'loan',
+            function ($query) {
+                        $query->where('loan_type', '<>','3');
+                    }
+                )->where('loan_id', $loan_id)->where('is_paid', 'YES')->sum('installment_amount');
+        return  $paid_amt;
+
+    }
 
     public static function getDue($loan_amt,$paid_amt){
         return self::rupee_format($loan_amt - $paid_amt);
+
+    }
+
+    //loan type find by loan id
+    public static function getLoanTypeById($loan_id){
+        return Loan::find($loan_id)->loan_type;
 
     }
 }

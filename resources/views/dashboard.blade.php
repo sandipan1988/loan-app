@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-7 col-md-8">
                                     <div class="numbers">
-                                        <p class="card-category">Overdue</p>
+                                        <p class="card-category">Total Due</p>
                                         <p class="card-title"><i class="fa fa-inr"
                                                 aria-hidden="true"></i>{{ Helper::rupee_format($overdue) }}
                                         <p>
@@ -128,15 +128,3 @@
         </div>
     </div>
 @endsection
-
-@push('js')
-    <script type="text/javascript">
-        $(document).ready(function() {
-            // Javascript method's body can be found in assets/js/demos.js
-            demo.initDashboardPageCharts();
-
-            demo.showNotification();
-
-        });
-    </script>
-@endpush

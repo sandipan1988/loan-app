@@ -106,7 +106,7 @@
                                         <td>{{Helper::rupee_format($loan->loan_amount) }}</td>
                                         <td>{{Helper::rupee_format($loan->installment_amount) }}</td>
                                         <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
-                                        <td>{{ $loan->loan_end_date->format('d/m/Y') }}</td>
+                                        <td>{{ $loan->loan_end_date?->format('d/m/Y') }}</td>
 
                                     </tr>
                                     @endforeach

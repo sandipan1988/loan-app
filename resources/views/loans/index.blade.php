@@ -107,7 +107,7 @@
                                     <td>{{ Helper::rupee_format($loan->loan_amount) }}</td>
                                     <td>{{ Helper::rupee_format($loan->installment_amount) }}</td>
                                     <td>
-                                        {{ Helper::getDue($loan->loan_amount,Helper::getPaid($loan->loan_id)) }}
+                                        {{ Helper::getDue($loan->loan_amount,Helper::getPaidForCal($loan->loan_id)) }}
                                     </td>
 
                                     <td>
@@ -115,7 +115,7 @@
                                         <a href="{{route('amortization-schedule-dowload',$loan->loan_id)}}"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
                                     </td>
                                     <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
-                                    <td>{{ $loan->loan_end_date->format('d/m/Y') }}</td>
+                                    <td>{{ $loan->loan_end_date?->format('d/m/Y') }}</td>
                                     <td class="d-flex ">
                                         <a href="{{route('edit-loan',$loan->loan_id)}}"><i class="fa fa-edit" title="Edit Loan"></i></a>
                                         <a href="{{route('del-loan',$loan->loan_id)}}"><i class="fa fa-trash" title="Delete Loan"></i></a>

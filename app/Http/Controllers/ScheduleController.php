@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-
+use App\Models\Interests;
+use App\Helpers\HelperClass;
 
 class ScheduleController extends Controller
 {
@@ -36,7 +36,7 @@ class ScheduleController extends Controller
         $search_date = '';
         $phone = '';
         $name = '';
-        if (session('search') && (session('search')['name']!="" || session('search')['search_date']!="")) {
+        if (session('search') && (session('search')['name'] != "" || session('search')['search_date'] != "")) {
             $search_data = session('search');
             //print_r($search_data);
 
@@ -76,19 +76,18 @@ class ScheduleController extends Controller
             }
 
             session(['search' => '']);
-        }
-        else{
-                    // get current date (Y-m-d)
-        $cur_date = Carbon::now()->format('Y-m-d');
-        $schedules = Schedule::with('loan')->where('installment_date', $cur_date)->paginate(10);
+        } else {
+            // get current date (Y-m-d)
+            $cur_date = Carbon::now()->format('Y-m-d');
+            $schedules = Schedule::with('loan')->where('installment_date', $cur_date)->paginate(10);
         }
         //echo $search_date;
 
         //dd($schedules);
-        $data=[
+        $data = [
             'schedules' => $schedules,
             'message' => $message,
-            'search_date' => $search_date? Carbon::parse($search_date) : "",
+            'search_date' => $search_date ? Carbon::parse($search_date) : "",
             'phone' => $phone,
             'name' => $name
         ];
@@ -96,8 +95,9 @@ class ScheduleController extends Controller
         //echo $data['search_date'];
 
         return view(
-            'schedule.index', $data
-            
+            'schedule.index',
+            $data
+
         );
     }
 
@@ -108,7 +108,7 @@ class ScheduleController extends Controller
         $search_date = "";
 
         if ($request->input('search-date') != '') {
-            $search_date = $request->input('search-date'); 
+            $search_date = $request->input('search-date');
         }
 
         if ($request->input('name') != '') {
@@ -140,6 +140,15 @@ class ScheduleController extends Controller
                 $schedule->is_paid = 'YES';
                 $schedule->paid_date = Carbon::now()->format('Y-m-d');
                 $schedule->save();
+                $install_amnt = $schedule->installment_amount;
+
+               $loan_type = HelperClass::getLoanTypeById($schedule->loan_id);
+                if ($loan_type == '3') {
+                    $int_obj = new Interests();
+                    $int_obj->loan_id = $schedule->loan_id;
+                    $int_obj->interest_amount = $install_amnt;
+                    $int_obj->save();
+                }
             }
         }
 
