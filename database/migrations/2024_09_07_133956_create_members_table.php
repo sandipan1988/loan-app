@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('phone')->unique();
             $table->string('address')->nullable();
             $table->string('photo')->nullable();
+            $table->string('govt_id')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->date('date_became_member')->nullable();
             $table->timestamps();

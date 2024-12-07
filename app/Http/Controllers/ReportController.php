@@ -7,6 +7,8 @@ use Illuminate\Support\Carbon;
 use App\Models\Schedule;
 use App\Models\Interests;
 use App\Models\Loan;
+use App\Exports\DailyExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -14,6 +16,18 @@ class ReportController extends Controller
 
     public function getDues()
     {
+
+        $data = $this->getDueData();
+        
+        return view('report.due', $data);
+    }
+
+    public function export() 
+{
+    return Excel::download(new DailyExport, 'invoices.xlsx');
+}
+
+    public function getDueData(){
         //todays due 
         // get current date (Y-m-d)
         $cur_date = Carbon::now()->format('Y-m-d');
@@ -31,7 +45,7 @@ class ReportController extends Controller
         $schedules_all = Schedule::with('loan')->where('installment_date', '<=', $cur_date)->where('is_paid', 'NO')->orderBy('installment_date')->paginate(10);
         $schedules_amount_all = Schedule::where('installment_date', '<=', $cur_date)->where('is_paid', 'NO')->sum('installment_amount');
 
-        $data = [
+       return  $data = [
             'schedules' => $schedules,
             'schedules_yes' => $schedules_yesterday,
             'schedules_all' => $schedules_all,
@@ -39,11 +53,14 @@ class ReportController extends Controller
             'cur_date' => $cur_date,
             'yesterday_date' => $yesterday_date,
             'schedules_amount_yesterday' => $schedules_amount_yesterday,
-            'schedules_amount_all' => $schedules_amount_all
+            'schedules_amount_all' => $schedules_amount_all,
+            'search' => '0',
+            'start_date' => '',
+            'end_date' => '',
+            'name' => '',
 
         ];
 
-        return view('report.due', $data);
     }
     public function searchDues(Request $request)
     {
@@ -53,7 +70,8 @@ class ReportController extends Controller
             'start_date' => '',
             'end_date' => '',
             'name' => '',
-            'search' => ''
+            'search' => '',
+            'total_due' => '0'
         ];
         if ($request->search == 1) {
 
@@ -72,24 +90,39 @@ class ReportController extends Controller
                         );
                     }
                 )->where('is_paid', 'NO')->get();
+
+                $total_due = Schedule::with('loan')->whereHas(
+                    'loan',
+                    function ($query) use ($name) {
+                        $query->with('members')->whereHas(
+                            'members',
+                            function ($query1) use ($name) {
+                                $query1->where('name', $name);
+                            }
+                        );
+                    }
+                )->where('is_paid', 'NO')->sum('installment_amount');
                 $data = [
                     'schedules' => $schedules,
                     'start_date' => '',
                     'end_date' => '',
                     'name' => $request->name,
-                    'search' => '1'
+                    'search' => '1',
+                    'total_due' => $total_due
                 ];
             } elseif (!empty($request->from_search_date) && !empty($request->to_search_date)) {
                 $start_date = $request->from_search_date;
                 $end_date = $request->to_search_date;
                 $schedules = Schedule::with('loan')->whereBetween('installment_date', [$start_date, $end_date])->where('is_paid', 'NO')->get();
 
+                $total_due = Schedule::with('loan')->whereBetween('installment_date', [$start_date, $end_date])->where('is_paid', 'NO')->sum('installment_amount');
                 $data = [
                     'schedules' => $schedules,
                     'start_date' => $start_date,
                     'end_date' => $end_date,
                     'name' => '',
-                    'search' => '1'
+                    'search' => '1',
+                    'total_due' => $total_due
                 ];
             } else {
                 $data = [
@@ -99,7 +132,8 @@ class ReportController extends Controller
                     'start_date' => '',
                     'end_date' => '',
                     'name' => '',
-                    'search' => '1'
+                    'search' => '1',
+                    'total_due' => '0'
 
                 ];
             }
@@ -140,6 +174,22 @@ class ReportController extends Controller
                     }
                 )->sum('interest_amount');
 
+                $total_loan = Loan::with('members')->whereHas(
+                    'members',
+                    function ($query) use ($name) {
+                                $query->where('name', $name);
+                            }
+                        )->sum('loan_amount');
+
+                 $total_loss = Loan::with('members')->whereHas(
+                            'members',
+                            function ($query) use ($name) {
+                                        $query->where('name', $name);
+                                    }
+                                )->sum('loss_amount');
+                    
+            
+
 
                 $data = [
                     'schedules' => $interest,
@@ -147,7 +197,11 @@ class ReportController extends Controller
                     'end_date' => '',
                     'name' => $request->name,
                     'search' => '1',
+                    'profit' => $total_loan + $total_interests - $total_loss,
+                    'total_loan' => $total_loan,
                     'total_interests' => $total_interests,
+                    'total_loss' => $total_loss
+
                 ];
             } elseif (!empty($request->from_search_date) && !empty($request->to_search_date)) {
                 $start_date = $request->from_search_date;
@@ -166,13 +220,20 @@ class ReportController extends Controller
                     }
                 )->sum('interest_amount');
 
+                $total_loan = Loan::whereBetween('loan_start_date', [$start_date, $end_date])->sum('loan_amount');
+
+                $total_loss = Loan::whereBetween('loan_start_date', [$start_date, $end_date])->sum('loss_amount');
+
                 $data = [
                     'schedules' => $interest,
                     'start_date' => $start_date,
                     'end_date' => $end_date,
                     'name' => '',
                     'search' => '1',
+                    'profit' => $total_loan + $total_interests - $total_loss,
+                    'total_loan' => $total_loan,
                     'total_interests' => $total_interests,
+                    'total_loss' => $total_loss
                 ];
             } else {
                 $data = [
@@ -183,22 +244,34 @@ class ReportController extends Controller
                     'end_date' => '',
                     'name' => '',
                     'search' => '1',
-                    'total_interests' => 0,
+                    'profit' => '0',
+                    'total_loan' => '0',
+                    'total_interests' => '0',
+                    'total_loss' => '0'
 
                 ];
             }
         } else {
             $interests = Interests::with('loan')->paginate(10);
 
+            $total_loan = Loan::sum('loan_amount');
+
+
             $total_interests = Interests::sum('interest_amount');
+
+            $total_loss = Loan::sum('loss_amount');
+        
 
             $data = [
                 'schedules' => $interests,
-                'total_interests' => $total_interests,
+                'profit' => $total_loan + $total_interests - $total_loss,
                 'start_date' => '',
                 'end_date' => '',
                 'name' => '',
-                'search' => ''
+                'search' => '',
+                'total_loan' => $total_loan,
+                'total_interests' => $total_interests,
+                'total_loss' => $total_loss
             ];
         }
 
@@ -229,24 +302,47 @@ class ReportController extends Controller
                     }
                 )->get();
 
+                $total_loan = Loan::with('members')->whereHas(
+                    'members',
+                    function ($query) use ($name) {
+                        $query->where('name', $name);
+                    }
+                )->sum('loan_amount');
+
+            $total_installation_amount = Loan::with('members')->whereHas(
+                'members',
+                function ($query) use ($name) {
+                    $query->where('name', $name);
+                }
+            )->sum('installment_amount');
+
                 $data = [
                     'loans' => $loans,
                     'start_date' => '',
                     'end_date' => '',
                     'name' => $request->name,
-                    'search' => '1'
+                    'search' => '1',
+                    'total_loan' => $total_loan,
+                'total_installation_amount' =>  $total_installation_amount
+           
                 ];
             } elseif (!empty($request->from_search_date) && !empty($request->to_search_date)) {
                 $start_date = $request->from_search_date;
                 $end_date = $request->to_search_date;
                 $loans = Loan::with('members')->whereBetween('loan_start_date', [$start_date, $end_date])->get();
+                $total_loan = Loan::with('members')->whereBetween('loan_start_date', [$start_date, $end_date])->sum('loan_amount');
+
+                $total_installation_amount = Loan::with('members')->whereBetween('loan_start_date', [$start_date, $end_date])->sum('installment_amount');
 
                 $data = [
                     'loans' => $loans,
                     'start_date' => $start_date,
                     'end_date' => $end_date,
                     'name' => '',
-                    'search' => '1'
+                    'search' => '1',
+                    'total_loan' => $total_loan,
+                'total_installation_amount' =>  $total_installation_amount
+           
                 ];
             } else {
                 $data = [
@@ -256,19 +352,28 @@ class ReportController extends Controller
                     'start_date' => '',
                     'end_date' => '',
                     'name' => '',
-                    'search' => '1'
+                    'search' => '1',
+                    'total_loan' => '0',
+                'total_installation_amount' =>  '0'
+           
 
                 ];
             }
         } else {
             $loans = Loan::with('members')->paginate(10);
 
+            $total_loan = Loan::sum('loan_amount');
+
+            $total_installation_amount = Loan::sum('installment_amount');
+
             $data = [
                 'loans' => $loans,
                 'start_date' => '',
                 'end_date' => '',
                 'name' => '',
-                'search' => ''
+                'search' => '',
+                'total_loan' => $total_loan,
+                'total_installation_amount' =>  $total_installation_amount
             ];
         }
 

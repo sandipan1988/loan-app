@@ -70,11 +70,11 @@
                             </div>
                         </div>
 
-                        <div class="col-12 mt-2">
-                            Total Interest: <span class="badge badge-warning"> <i class="fa fa-inr"
-                            aria-hidden="true"></i>{{ Helper::rupee_format($total_interests)}}</span>
+                        <div class="col-2 mt-2">
+                            Total Profit: <span class="badge badge-warning"> <i class="fa fa-inr"
+                            aria-hidden="true"></i>{{ Helper::rupee_format($profit)}}</span>
+                          
                         </div>
-
 
                         <div class="toolbar">
                             <!--        Here you can write extra buttons/actions for the toolbar              -->
@@ -84,10 +84,11 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Mobile</th>
                                         <th>Account No.</th>
-                                        <th>Installment Amount</th>
-                                        <th>Total interest</th>
+                                        <th>Principle (Total = {{Helper::rupee_format($total_loan)}})</th>
+                                        <th>Total interest (Total = {{Helper::rupee_format($total_interests)}})</th>
+                                        <th>Loss (Total = {{Helper::rupee_format($total_loss)}} )</th>
+                                        <th>Profit (Total = {{Helper::rupee_format($profit)}})</th>
                                         <th>Loan Type</th>
                                       
                                     </tr>
@@ -97,11 +98,17 @@
                                 <tbody>
                                     @foreach ($schedules as $schedule)
                                         <tr>
-                                            <td><a href="{{route('ledger', $schedule->loan->member_id)}}"> {{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</a></td>
-                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
+                                            <td><a href="{{route('ledger', $schedule->loan->member_id)}}"> 
+                                                {{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</a></td>
+                                   
+                                            
                                             <td>{{ $schedule->loan->loan_account }}</td>
-                                            <td>{{ Helper::rupee_format($schedule->loan->installment_amount) }}</td>
+                                            <td>{{ Helper::rupee_format($schedule->loan->loan_amount ) }}</td>
                                             <td>{{ Helper::rupee_format($schedule->interest_amount) }}</td>
+                                            <td>{{ Helper::rupee_format($schedule->loan->loss_amount) }}</td>
+                                            <td>{{ Helper::rupee_format($schedule->loan->loan_amount + $schedule->interest_amount - $schedule->loan->loss_amount)}}</td>
+
+                                            
                                             <td>{{ Helper::getLoanType($schedule->loan->loan_type) }}</td>
                                            
                                        

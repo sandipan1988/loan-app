@@ -18,9 +18,12 @@ return new class extends Migration
             $table->text('loan_account')->unique();
             $table->unsignedBigInteger('member_id');
             $table->enum('loan_type', ['1', '2','3']);
+            $table->double('processing_charge');
             $table->double('interest_rate');
             $table->double('loan_amount');
             $table->double('installment_amount');
+            $table->double('loss_amount')->default(0);
+            $table->enum('status', ['OPEN', 'CLOSED'])->default('OPEN');
             $table->date('loan_start_date');
             $table->date('loan_end_date')->nullable();
             $table->timestamps();

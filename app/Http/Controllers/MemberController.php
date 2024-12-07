@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use App\Helpers\HelperClass;
-use PHPUnit\TextUI\Help;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MemberController extends Controller
 {
@@ -82,6 +82,12 @@ class MemberController extends Controller
             $member->photo = 'images/' . $fileName;
         }
 
+        if ($request->hasFile('govt_id')) {
+            $fileName = time() . '_' . $request->govt_id->getClientOriginalName();
+            $request->govt_id->move(public_path('images'), $fileName);
+            $member->govt_id = 'images/' . $fileName;
+        }
+
 
         $member->date_of_birth = $request->date_of_birth;
         $member->date_became_member = $request->date_became_member;
@@ -103,6 +109,11 @@ class MemberController extends Controller
             $request->photo->move(public_path('images'), $fileName);
             $member->photo = 'images/' . $fileName;
         }
+        if ($request->hasFile('govt_id')) {
+            $fileName = time() . '_' . $request->govt_id->getClientOriginalName();
+            $request->govt_id->move(public_path('images'), $fileName);
+            $member->govt_id = 'images/' . $fileName;
+        }
 
 
         $member->date_of_birth = $request->date_of_birth;
@@ -118,6 +129,20 @@ class MemberController extends Controller
 
         return view('members.edit', ['member' => $member]);
     }
+
+    public function getMember($id)
+    {
+        $member = Member::find($id);
+        $filename='member-'.$member->name.'-'.time().'.pdf';
+
+        $pdf = Pdf::loadView('members.memberPDF', ['member' => $member]);
+        Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif']);;
+        return $pdf->download($filename);
+    }
+
+
+
+
     public function delete($id)
     {
         $member = Member::find($id);

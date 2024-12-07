@@ -88,8 +88,8 @@
                                     <th>Loan Type</th>
                                     <th>Day</th>
                                     <th>Interest Rate</th>
-                                    <th>Loan Amount</th>
-                                    <th>Installment Amount</th>
+                                    <th>Loan Amount (Total = {{Helper::rupee_format($total_loan)}}) </th>
+                                    <th>Installment Amount (Total = {{Helper::rupee_format($total_installation_amount)}})</th>
                                     <th>Loan Start Date</th>
                                     <th>Loan End Date</th>
                                 </tr>

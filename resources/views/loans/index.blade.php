@@ -90,6 +90,7 @@
                                     <th>Balance Amount</th>
                                     <th>Amortization</th>
                                     <th>Loan Start Date</th>
+                                    <th>Loan Day</th>
                                     <th>Loan End Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -115,6 +116,7 @@
                                         <a href="{{route('amortization-schedule-dowload',$loan->loan_id)}}"><i class="fa fa-download" title="Download schedule" aria-hidden="true"></i></a>
                                     </td>
                                     <td>{{ $loan->loan_start_date->format('d/m/Y') }}</td>
+                                    <td>{{ $loan->loan_type== '2' ? Helper::getDay($loan->loan_start_date) : '' }}</td>
                                     <td>{{ $loan->loan_end_date?->format('d/m/Y') }}</td>
                                     <td class="d-flex ">
                                         <a href="{{route('edit-loan',$loan->loan_id)}}"><i class="fa fa-edit" title="Edit Loan"></i></a>

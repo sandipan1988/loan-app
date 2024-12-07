@@ -1,4 +1,4 @@
-@extends('layouts.app', ['activePage' => 'due-report', 'title' => 'Dues Report', 'navName' => 'Dues Report', 'activeButton' => 'report'])
+@extends('layouts.app', ['activePage' => 'due-report', 'title' => 'Daily Collection', 'navName' => 'Daily Collection', 'activeButton' => 'report'])
 
 @section('content')
     <div class="content">
@@ -65,7 +65,7 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-8">
-                                    <h3 class="mb-0">Customer Due Management</h3>
+                                    <h3 class="mb-0">Daily Collection</h3>
                                     <p class="text-sm mb-0">
                                     </p>
                                 </div>
@@ -74,10 +74,11 @@
                                 </div>
                             </div>
                         </div>
-                        @if(isset($search) && $search!='1')
+                        @if($search!='1')
                         <div class="col-12 mt-2">
-                            Today's Due: <span class="badge badge-warning"> <i class="fa fa-inr"
+                            Today's collection: <span class="badge badge-warning"> <i class="fa fa-inr"
                             aria-hidden="true"></i>{{ Helper::rupee_format($schedules_amount)}}</span>
+                            <a href="{{route('daily-export')}}" class="btn btn-sm btn-default">Excel</a>
                         </div>
 
 
@@ -89,9 +90,9 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Mobile</th>
+                                       
                                         <th>Account No.</th>
-                                        <th>Installment Amount</th>
+                                        <th>Installment Amount (Total = {{ Helper::rupee_format($schedules_amount)}})</th>
                                         <th>Imnstallment Date</th>
                                         <th>Paid Status</th>
                                       
@@ -103,7 +104,7 @@
                                     @foreach ($schedules as $schedule)
                                         <tr>
                                             <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</td>
-                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
+                                   
                                             <td>{{ $schedule->loan->loan_account }}</td>
                                             <td>{{ Helper::rupee_format($schedule->installment_amount )}}</td>
                                             <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>
@@ -129,9 +130,8 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Mobile</th>
                                         <th>Account No.</th>
-                                        <th>Installment Amount</th>
+                                        <th>Installment Amount (Total = {{ Helper::rupee_format($schedules_amount_yesterday) }})</th>
                                         <th>Imnstallment Date</th>
                                         <th>Paid Status</th>
                                       
@@ -143,7 +143,6 @@
                                     @foreach ($schedules_yes as $schedule)
                                         <tr>
                                             <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</td>
-                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
                                             <td>{{ $schedule->loan->loan_account }}</td>
                                             <td>{{ Helper::rupee_format($schedule->installment_amount)}}</td>
                                             <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>
@@ -169,9 +168,8 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Mobile</th>
                                         <th>Account No.</th>
-                                        <th>Installment Amount</th>
+                                        <th>Installment Amount (Total = {{ Helper::rupee_format($schedules_amount_all) }})</th>
                                         <th>Imnstallment Date</th>
                                         <th>Paid Status</th>
                                       
@@ -183,7 +181,6 @@
                                     @foreach ($schedules_all as $schedule)
                                         <tr>
                                             <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</td>
-                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
                                             <td>{{ $schedule->loan->loan_account }}</td>
                                             <td>{{ Helper::rupee_format($schedule->installment_amount) }}</td>
                                             <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>
@@ -196,6 +193,11 @@
                         </div>
                         {{$schedules_all->links()}}
                         @else
+                        <div class="col-12 mt-2">
+                            Total Due: <span class="badge badge-warning"> <i class="fa fa-inr"
+                            aria-hidden="true"></i>{{ Helper::rupee_format($total_due)}}</span>
+                        </div>
+
                         
                         <div class="toolbar">
                             <!--        Here you can write extra buttons/actions for the toolbar              -->
@@ -205,7 +207,6 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Mobile</th>
                                         <th>Account No.</th>
                                         <th>Installment Amount</th>
                                         <th>Imnstallment Date</th>
@@ -219,7 +220,6 @@
                                     @foreach ($schedules as $schedule)
                                         <tr>
                                             <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[0] }}</td>
-                                            <td>{{ Helper::memberNameandPhone($schedule->loan->member_id)[1]  }}</td>
                                             <td>{{ $schedule->loan->loan_account }}</td>
                                             <td>{{ Helper::rupee_format($schedule->installment_amount)}}</td>
                                             <td>{{ $schedule->installment_date->format('d-m-Y') }}</td>

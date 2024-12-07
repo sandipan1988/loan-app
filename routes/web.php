@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/edit-member/{member_id}', [App\Http\Controllers\MemberController::class, 'edit'])->name('edit-member');
 	Route::post('/update-member/{member_id}', [App\Http\Controllers\MemberController::class, 'update'])->name('update-member');
 	Route::get('/del-member/{member_id}', [App\Http\Controllers\MemberController::class, 'delete'])->name('del-member');
+	Route::get('/member-download/{id}', [App\Http\Controllers\MemberController::class, 'getMember'])->name('member-download');
 
 	Route::any('/loan', [App\Http\Controllers\LoanController::class, 'index'])->name('loan');
 	Route::get('/add-loan', [App\Http\Controllers\LoanController::class, 'add'])->name('add-loan');
@@ -40,7 +41,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::patch('/update-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'update'])->name('update-loan');
 	Route::get('/del-loan/{loan_id}', [App\Http\Controllers\LoanController::class, 'delete'])->name('del-loan');
 	Route::post('/find-by-name', [App\Http\Controllers\LoanController::class, 'findByName'])->name('find-by-name');
-	
+	Route::post('/close-loan', [App\Http\Controllers\LoanController::class, 'close_loan'])->name('close-loan');
 
 
 	Route::get('/schedule', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedule');
@@ -54,6 +55,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/ledger/{member_id}', [App\Http\Controllers\ReportController::class, 'ledger'])->name('ledger');
 	Route::any('/sale-report', [App\Http\Controllers\ReportController::class, 'saleReport'])->name('sale-report');
 	Route::any('/due-report-search', [App\Http\Controllers\ReportController::class, 'searchDues'])->name('due-search');
+	Route::get('due/export/', [App\Http\Controllers\ReportController::class, 'export'])->name('daily-export');
 });
 
 Route::group(['middleware' => 'auth'], function () {

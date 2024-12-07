@@ -31,13 +31,14 @@ UPDIVISION',
                                     <label for="loan_type" class="col-md-4 col-form-label text-md-right">Loan
                                         Type</label>
                                     <div class="col-md-2">
-                                        <select class="form-control" aria-label="Large select example" name="loan_type">
+                                        <select id="loan_type" class="form-control" aria-label="Large select example" name="loan_type">
                                             <option value="1" selected>Daily</option>
                                             <option value="2">Weekly</option>
                                             <option value="3">Monthly</option>
                                         </select>
                                     </div>
                                 </div>
+                              
                                 <div class="form-group row">
                                     <label for="interest_rate" class="col-md-4 col-form-label text-md-right">Interest
                                         Rate</label>
@@ -68,17 +69,16 @@ UPDIVISION',
                                             required>
                                     </div>
                                 </div>
-
-                                <!-- <div class="form-group row">
-                                    <label for="install-amount"
-                                        class="col-md-4 col-form-label text-md-right">Installment Amount</label>
+                                <div class="form-group row">
+                                    <label for="amount" class="col-md-4 col-form-label text-md-right">Processing
+                                        Charge</label>
                                     <div class="col-md-3">
-                                        <input type="text" id="install-amount" class="form-control"
-                                            name="installment_amount" required>
+                                        <input type="text" id="amount" class="form-control" name="processing_charge"
+                                            >
                                     </div>
-                                </div> -->
+                                </div>
 
-
+                                
                                 <div class="form-group row">
                                     <label for="loan-start-date" class="col-md-4 col-form-label text-md-right">Loan
                                         Start Date</label>
@@ -117,6 +117,16 @@ UPDIVISION',
                 $("#other-interest").removeAttr('required');
             }
         });
+
+        $('#loan_type').on('change', function() {
+            var selectVal = $("#loan_type option:selected").val();
+            if (selectVal.trim() == "2") {
+                $("#loan_day").removeClass('d-none');
+            } else {
+                $("#loan_day").addClass('d-none');
+            }
+        });
+
         $('#name').autocomplete({
             source: function(request, response) {
                 $.ajax({

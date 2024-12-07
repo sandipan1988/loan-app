@@ -9,6 +9,7 @@ use App\Models\Loan;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Client\Request as ClientRequest;
 
 use function PHPSTORM_META\exitPoint;
 
@@ -68,7 +69,7 @@ class LoanController extends Controller
 
     public function getScheduleById($loan_id)
     {
-        $loans = Loan::where('loan_id',$loan_id)->first();
+        $loans = Loan::with('members')->where('loan_id',$loan_id)->first();
 
 
         $schedules= Schedule::where('loan_id', $loan_id)->paginate(10);
@@ -300,6 +301,8 @@ class LoanController extends Controller
         $loan->interest_rate = trim($loan->interest_rate);
         $loan->loan_amount = $request->input('loan_amount');
 
+        $loan->processing_charge = $request->input('processing_charge');
+
         $random = mt_rand(10000000, 99999999);
 
         $loan->loan_account = "AC" . $random;
@@ -349,7 +352,6 @@ class LoanController extends Controller
 
             $installment_amount = 7*doubleval($loan->loan_amount / 100);
             $loan->installment_amount = $installment_amount;
-
             $loan->save();
 
             $loan_id = $loan->loan_id;
@@ -436,5 +438,20 @@ class LoanController extends Controller
         return $pdf->download($filename);
     }
 
-    //public function getStatement()
+    public function close_loan(Request $request){
+        $loan_id = $request->input('loan_id');
+        $loss= trim($request->input('loss_amount'));
+
+        $loan = Loan::find($loan_id);
+
+
+        $loan->loss_amount=$loss;
+        $loan->status='CLOSED';
+       
+        $loan->loan_end_date=Carbon::now()->toDateString();
+        $loan->save();
+        return redirect()->route('amortization-schedule',$loan_id);
+    }
+
+    
 }

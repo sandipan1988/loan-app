@@ -88,7 +88,7 @@ Tip 2: you can also add an image using data-image tag
                         <li class="nav-item @if($activePage == 'due-report') active @endif">
                             <a class="nav-link" href="{{Route('due-report')}}">
                                 <i class="nc-icon nc-circle-09"></i>
-                                <p>{{ __("Dues Report") }}</p>
+                                <p>{{ __("Daily Collection") }}</p>
                             </a>
                         </li>
                         <li class="nav-item @if($activePage == 'sale-report') active @endif">

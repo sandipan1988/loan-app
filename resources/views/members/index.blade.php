@@ -109,6 +109,7 @@
                                     <td class="d-flex justify">
                                         <a href="{{route('edit-member', $member->member_id)}}"><i class="fa fa-edit"></i></a>
                                         <a href="{{route('del-member', $member->member_id)}}"><i class="fa fa-trash"></i></a>
+                                        <a href="{{route('member-download',$member->member_id)}}"><i class="fa fa-download" aria-hidden="true" title="Download"></i></a>
                                     </td>
                                 </tr>
                                 @endforeach
